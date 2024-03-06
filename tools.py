@@ -297,23 +297,23 @@ def plot_amount(data, col, val, bins=30, label_rotation=True):
 
     return fig
 
-def plot_years(data, col, val, bins=50, label_rotation=True):
-    plt.style.use('fivethirtyeight')
-
-    '''use this for plotting the distribution of numerical features'''
-    fig, ax = plt.subplots()
-    ax.set_title(f"Distribution of {col}")
-    sns.histplot(-(data[col].dropna()), kde=True, bins=bins, ax=ax)
-    ax.set_xlabel(f"{col} (Years)")
-    ax.set_ylabel("Density")
-
-    if label_rotation:
-        ax.set_xticks(ax.get_xticks())
-        ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha='right')  # Ajout de l'argument 'ha'
-
-    plt.axvline(x=val, color='red', linestyle='--')  # Set the y-axis limit
-
-    st.pyplot(fig)
+# def plot_years(data, col, val, bins=50, label_rotation=True):
+#     plt.style.use('fivethirtyeight')
+#
+#     '''use this for plotting the distribution of numerical features'''
+#     fig, ax = plt.subplots()
+#     ax.set_title(f"Distribution of {col}")
+#     sns.histplot(-(data[col].dropna()), kde=True, bins=bins, ax=ax)
+#     ax.set_xlabel(f"{col} (Years)")
+#     ax.set_ylabel("Density")
+#
+#     if label_rotation:
+#         ax.set_xticks(ax.get_xticks())
+#         ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha='right')  # Ajout de l'argument 'ha'
+#
+#     plt.axvline(x=val, color='red', linestyle='--')  # Set the y-axis limit
+#
+#     st.pyplot(fig)
 
 
 def post_treatment(df):
