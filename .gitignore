@@ -14,3 +14,4 @@ __pycache__
 agg_previous_application.csv
 application_train_prepro.csv
 agg_bureau.csv
+*.png
