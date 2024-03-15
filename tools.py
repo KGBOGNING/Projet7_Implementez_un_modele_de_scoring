@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import LabelEncoder, PolynomialFeatures, MinMaxScaler, OneHotEncoder
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-# from matplotlib.ticker import MaxNLocator, AutoMinorLocator
+# from matplotlib.ticker import MaxNLocator, AutoMinorLocator,PolynomialFeatures,
 
 # imputer for handling missing values
 from sklearn.impute import SimpleImputer
@@ -18,72 +18,72 @@ plt.rcParams['figure.max_open_warning'] = 50
 
 
 # Function to calculate missing values by column# Funct
-def missing_values_table(df):
-    # Total missing values
-    mis_val = df.isnull().sum()
+# def missing_values_table(df):
+#     # Total missing values
+#     mis_val = df.isnull().sum()
+#
+#     # Percentage of missing values
+#     mis_val_percent = 100 * df.isnull().sum() / len(df)
+#
+#     # Make a table with the results
+#     mis_val_table = pd.concat([mis_val, mis_val_percent], axis=1)
+#
+#     # Rename the columns
+#     mis_val_table_ren_columns = mis_val_table.rename(
+#         columns={0: 'Missing Values', 1: '% of Total Values'})
+#
+#     # Sort the table by percentage of missing descending
+#     mis_val_table_ren_columns = mis_val_table_ren_columns[
+#         mis_val_table_ren_columns.iloc[:, 1] != 0].sort_values(
+#         '% of Total Values', ascending=False).round(1)
+#
+#     # Print some summary information
+#     print("Your selected dataframe has " + str(df.shape[1]) + " columns.\n"
+#                                                               "There are " + str(mis_val_table_ren_columns.shape[0]) +
+#           " columns that have missing values.")
+#
+#     # Return the dataframe with missing information
+#     return mis_val_table_ren_columns
 
-    # Percentage of missing values
-    mis_val_percent = 100 * df.isnull().sum() / len(df)
 
-    # Make a table with the results
-    mis_val_table = pd.concat([mis_val, mis_val_percent], axis=1)
-
-    # Rename the columns
-    mis_val_table_ren_columns = mis_val_table.rename(
-        columns={0: 'Missing Values', 1: '% of Total Values'})
-
-    # Sort the table by percentage of missing descending
-    mis_val_table_ren_columns = mis_val_table_ren_columns[
-        mis_val_table_ren_columns.iloc[:, 1] != 0].sort_values(
-        '% of Total Values', ascending=False).round(1)
-
-    # Print some summary information
-    print("Your selected dataframe has " + str(df.shape[1]) + " columns.\n"
-                                                              "There are " + str(mis_val_table_ren_columns.shape[0]) +
-          " columns that have missing values.")
-
-    # Return the dataframe with missing information
-    return mis_val_table_ren_columns
-
-
-def encoding_data(train, test):
-    # Create a label encoder object
-    le = LabelEncoder()
-    le_count = 0
-
-    # Iterate through the columns
-    for col in train:
-        if train[col].dtype == 'object':
-            # If 2 or fewer unique categories
-            if len(list(train[col].unique())) <= 2:
-                # Train on the training data
-                le.fit(train[col])
-                # Transform both training and testing data
-                train[col] = le.transform(train[col])
-                test[col] = le.transform(test[col])
-
-                # Keep track of how many columns were label encoded
-                le_count += 1
-
-    print('%d columns were label encoded.' % le_count)
-
-    # Onehot encoding of categorical Variables
-
-    a_train = pd.get_dummies(train)
-    a_test = pd.get_dummies(test)
-
-    train_labels = train['TARGET']
-
-    # Align the training and testing data, keep only columns present in both dataframes
-    train, test = train.align(test, join='inner', axis=1)
-
-    # Add the target back in
-    train['TARGET'] = train_labels
-
-    print('Training Features shape after align: ', train.shape)
-    print('Testing Features shape after align ', test.shape)
-
-    return a_train, a_test, train_labels
+# def encoding_data(train, test):
+#     # Create a label encoder object
+#     le = LabelEncoder()
+#     le_count = 0
+#
+#     # Iterate through the columns
+#     for col in train:
+#         if train[col].dtype == 'object':
+#             # If 2 or fewer unique categories
+#             if len(list(train[col].unique())) <= 2:
+#                 # Train on the training data
+#                 le.fit(train[col])
+#                 # Transform both training and testing data
+#                 train[col] = le.transform(train[col])
+#                 test[col] = le.transform(test[col])
+#
+#                 # Keep track of how many columns were label encoded
+#                 le_count += 1
+#
+#     print('%d columns were label encoded.' % le_count)
+#
+#     # Onehot encoding of categorical Variables
+#
+#     a_train = pd.get_dummies(train)
+#     a_test = pd.get_dummies(test)
+#
+#     train_labels = train['TARGET']
+#
+#     # Align the training and testing data, keep only columns present in both dataframes
+#     train, test = train.align(test, join='inner', axis=1)
+#
+#     # Add the target back in
+#     train['TARGET'] = train_labels
+#
+#     print('Training Features shape after align: ', train.shape)
+#     print('Testing Features shape after align ', test.shape)
+#
+#     return a_train, a_test, train_labels
 
     ################################################################
 
@@ -94,112 +94,112 @@ def plot_hist(name, app_train):
     plt.savefig(name + '.png')
 
 
-def hist_kde_plot(name, app_train):
-    fig, ax = plt.subplots(1, 2, figsize=(10, 8))
-
-    # Set the style of plots
-    sns.set(style="whitegrid")
-
-    # KDE plot of loans that were repaid on time
-    sns.kdeplot(app_train.loc[app_train['TARGET'] == 0, name] / 365, label='target == 0', ax=ax[0])
-
-    # KDE plot of loans which were not repaid on time
-    sns.kdeplot(app_train.loc[app_train['TARGET'] == 1, name] / 365, label='target == 1', ax=ax[0])
-
-    # Plot the distribution of ages in years
-    ax[1].hist(app_train[name] / 365, edgecolor='k', bins=25)
-
-    # Labeling of plot
-    ax[0].set_xlabel('Age (years)')
-    ax[0].set_ylabel('Density')
-    ax[0].set_title('Distribution of Ages')
-    ax[1].set_title('Age of Client')
-    ax[1].set_xlabel('Age (years)')
-    ax[1].set_ylabel('Count')
-
-    # Show pic
-    plt.savefig(name + '.png')
-
-
-def group_age(age_data):
-    # Group by the bin and calculate averages
-    age_groups = age_data.groupby('YEARS_BINNED').mean()
-    print(age_groups)
-
-    plt.figure(figsize=(8, 8))
-
-    # Graph the age bins and the average of the target as a bar plot
-    plt.bar(age_groups.index.astype(str), 100 * age_groups['TARGET'])
-
-    # Plot labeling
-    plt.xticks(rotation=75)
-    plt.xlabel('Age Group (years)')
-    plt.ylabel('Failure to Repay (%)')
-    plt.title('Failure to Repay by Age Group')
+# def hist_kde_plot(name, app_train):
+#     fig, ax = plt.subplots(1, 2, figsize=(10, 8))
+#
+#     # Set the style of plots
+#     sns.set(style="whitegrid")
+#
+#     # KDE plot of loans that were repaid on time
+#     sns.kdeplot(app_train.loc[app_train['TARGET'] == 0, name] / 365, label='target == 0', ax=ax[0])
+#
+#     # KDE plot of loans which were not repaid on time
+#     sns.kdeplot(app_train.loc[app_train['TARGET'] == 1, name] / 365, label='target == 1', ax=ax[0])
+#
+#     # Plot the distribution of ages in years
+#     ax[1].hist(app_train[name] / 365, edgecolor='k', bins=25)
+#
+#     # Labeling of plot
+#     ax[0].set_xlabel('Age (years)')
+#     ax[0].set_ylabel('Density')
+#     ax[0].set_title('Distribution of Ages')
+#     ax[1].set_title('Age of Client')
+#     ax[1].set_xlabel('Age (years)')
+#     ax[1].set_ylabel('Count')
+#
+#     # Show pic
+#     plt.savefig(name + '.png')
 
 
-def features_engineering_poly(app_train, list_train, app_test, list_test):
-    # Make a new dataframe for polynomial features
-    poly_features = app_train[list_train]
-    poly_features_test = app_test[list_test]
+# def group_age(age_data):
+#     # Group by the bin and calculate averages
+#     age_groups = age_data.groupby('YEARS_BINNED').mean()
+#     print(age_groups)
+#
+#     plt.figure(figsize=(8, 8))
+#
+#     # Graph the age bins and the average of the target as a bar plot
+#     plt.bar(age_groups.index.astype(str), 100 * age_groups['TARGET'])
+#
+#     # Plot labeling
+#     plt.xticks(rotation=75)
+#     plt.xlabel('Age Group (years)')
+#     plt.ylabel('Failure to Repay (%)')
+#     plt.title('Failure to Repay by Age Group')
 
-    # imputer for handling missing values
-    imputer = SimpleImputer(strategy='median')
-
-    poly_target = poly_features['TARGET']
-    poly_features = poly_features.drop(columns=['TARGET'])
-
-    # Need to impute missing values
-    poly_features = imputer.fit_transform(poly_features)
-    poly_features_test = imputer.transform(poly_features_test)
-
-    # Create the polynomial object with specified degree
-    poly_transformer = PolynomialFeatures(degree=3)
-
-    # Train the polynomial features
-    poly_transformer.fit(poly_features)
-
-    # Transform the features
-    poly_features = poly_transformer.transform(poly_features)
-    poly_features_test = poly_transformer.transform(poly_features_test)
-    print('Polynomial Features shape: ', poly_features.shape)
-
-    # Create a dataframe of the features
-    poly_features = pd.DataFrame(poly_features,
-                                 columns=poly_transformer.get_feature_names_out(['EXT_SOURCE_1', 'EXT_SOURCE_2',
-                                                                                 'EXT_SOURCE_3', 'DAYS_BIRTH']))
-
-    # Add in the target
-    poly_features['TARGET'] = poly_target
-
-    # Find the correlations with the target
-    poly_corrs = poly_features.corr()['TARGET'].sort_values()
-
-    # Display most negative and most positive
-    print('\nMost positive Correlation\n', poly_corrs.head(5))
-    print('\nMost Negative Correlation\n', poly_corrs.tail(5))
-
-    # Put test features into dataframe
-    poly_features_test = pd.DataFrame(poly_features_test,
-                                      columns=poly_transformer.get_feature_names_out(['EXT_SOURCE_1', 'EXT_SOURCE_2',
-                                                                                      'EXT_SOURCE_3', 'DAYS_BIRTH']))
-
-    # Merge polynomial features into training dataframe
-    poly_features['SK_ID_CURR'] = app_train['SK_ID_CURR']
-    app_train_poly = app_train.merge(poly_features, on='SK_ID_CURR', how='left')
-
-    # Merge polnomial features into testing dataframe
-    poly_features_test['SK_ID_CURR'] = app_test['SK_ID_CURR']
-    app_test_poly = app_test.merge(poly_features_test, on='SK_ID_CURR', how='left')
-
-    # Align the dataframes
-    app_train_poly, app_test_poly = app_train_poly.align(app_test_poly, join='inner', axis=1)
-
-    # Print out the new shapes
-    print('Training data with polynomial features shape: ', app_train_poly.shape)
-    print('Testing data with polynomial features shape:  ', app_test_poly.shape)
-
-    return app_train_poly, app_test_poly
+#
+# def features_engineering_poly(app_train, list_train, app_test, list_test):
+#     # Make a new dataframe for polynomial features
+#     poly_features = app_train[list_train]
+#     poly_features_test = app_test[list_test]
+#
+#     # imputer for handling missing values
+#     imputer = SimpleImputer(strategy='median')
+#
+#     poly_target = poly_features['TARGET']
+#     poly_features = poly_features.drop(columns=['TARGET'])
+#
+#     # Need to impute missing values
+#     poly_features = imputer.fit_transform(poly_features)
+#     poly_features_test = imputer.transform(poly_features_test)
+#
+#     # Create the polynomial object with specified degree
+#     poly_transformer = PolynomialFeatures(degree=3)
+#
+#     # Train the polynomial features
+#     poly_transformer.fit(poly_features)
+#
+#     # Transform the features
+#     poly_features = poly_transformer.transform(poly_features)
+#     poly_features_test = poly_transformer.transform(poly_features_test)
+#     print('Polynomial Features shape: ', poly_features.shape)
+#
+#     # Create a dataframe of the features
+#     poly_features = pd.DataFrame(poly_features,
+#                                  columns=poly_transformer.get_feature_names_out(['EXT_SOURCE_1', 'EXT_SOURCE_2',
+#                                                                                  'EXT_SOURCE_3', 'DAYS_BIRTH']))
+#
+#     # Add in the target
+#     poly_features['TARGET'] = poly_target
+#
+#     # Find the correlations with the target
+#     poly_corrs = poly_features.corr()['TARGET'].sort_values()
+#
+#     # Display most negative and most positive
+#     print('\nMost positive Correlation\n', poly_corrs.head(5))
+#     print('\nMost Negative Correlation\n', poly_corrs.tail(5))
+#
+#     # Put test features into dataframe
+#     poly_features_test = pd.DataFrame(poly_features_test,
+#                                       columns=poly_transformer.get_feature_names_out(['EXT_SOURCE_1', 'EXT_SOURCE_2',
+#                                                                                       'EXT_SOURCE_3', 'DAYS_BIRTH']))
+#
+#     # Merge polynomial features into training dataframe
+#     poly_features['SK_ID_CURR'] = app_train['SK_ID_CURR']
+#     app_train_poly = app_train.merge(poly_features, on='SK_ID_CURR', how='left')
+#
+#     # Merge polnomial features into testing dataframe
+#     poly_features_test['SK_ID_CURR'] = app_test['SK_ID_CURR']
+#     app_test_poly = app_test.merge(poly_features_test, on='SK_ID_CURR', how='left')
+#
+#     # Align the dataframes
+#     app_train_poly, app_test_poly = app_train_poly.align(app_test_poly, join='inner', axis=1)
+#
+#     # Print out the new shapes
+#     print('Training data with polynomial features shape: ', app_train_poly.shape)
+#     print('Testing data with polynomial features shape:  ', app_test_poly.shape)
+#
+#     return app_train_poly, app_test_poly
 
 
 def log_classification(app_train, train_labels, seed):
@@ -317,13 +317,6 @@ def plot_local_water(shap_values_loc, max_display=10):
     pio.write_image(fig, 'waterfall_plot.png')
 
     return
-
-
-def load_data():
-    path = './input/application_train.csv'
-    data = pd.read_csv(path)
-
-    return data
 
 
 def plot_amount(data, col, val, bins=30, label_rotation=True):
