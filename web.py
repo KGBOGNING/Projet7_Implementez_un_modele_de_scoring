@@ -2,7 +2,9 @@ import streamlit as st
 import numpy as np
 import requests
 from tools import draw_gauge
-if 'ID'  not in st.session_state.keys():
+
+
+if 'ID' not in st.session_state.keys():
     st.session_state['ID'] = None
 def get_id():
     return st.session_state['ID'] or None
@@ -15,9 +17,8 @@ if __name__ == "__main__":
         data = requests.get("http://localhost:3000/load_initial_data/v2")
         ids = data.json() and data.json()['ids'] or False
         values = data.json() and data.json()['values'] or False
-        print('Intial session state:',list( ids.values())[0] )
-        st.session_state['ID'] =list(ids.values())[0]
-
+        print('Intial session state:', list(ids.values())[0])
+        st.session_state['ID'] = list(ids.values())[0]
     else:
         data = requests.get("http://localhost:3000/load_data/v2/" + str(get_id()))
         ids = data.json() and data.json()['ids'] or False
@@ -62,8 +63,8 @@ if __name__ == "__main__":
                 st.write(f'Amount_Credit: {amt_credit}')
                 st.write(f'Amount_Annuity: {amt_annuity}')
                 st.write(f'Total_Income_Amount: {amt_income_total}')
-                st.write(f'Days_employed: {np.round(days_employed/365, 0)} years')
-                st.write(f'age_of_client: {np.round(-old/365, 0)} years')
+                st.write(f'Days_employed: {np.round(days_employed/365, 1)} years')
+                st.write(f'age_of_client: {np.round(old/365, 1)} years')
 
             else:
                 st.warning("No data found for the selected SK_ID.")
@@ -109,3 +110,9 @@ if __name__ == "__main__":
             current_value = np.round(proba*100, 2)
             st.write(f"Valeur actuelle du niveau de risque : {current_value}/{max_value}")
             draw_gauge(current_value, max_value)
+
+            st.divider()
+            st.subheader("Elements déterminants sur le statut du client")
+            st.image('waterfall_plot.png', caption='waterfall_plot')
+
+

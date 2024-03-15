@@ -1,10 +1,11 @@
-from tools import plot_amount, post_treatment, pre_encoded_feature, impute_data, scaling_data, encode_data_2
+from tools import (plot_amount, post_treatment, pre_encoded_feature, impute_data, scaling_data, encode_data_2,
+                   plot_local_water)
 from flask import Flask, request, jsonify
 from flask_caching import Cache
-import pandas as pd
 import pickle
-# import export
-# from pyspark.sql.functions import struct, col
+import pandas as pd
+import shap
+
 
 app = Flask(__name__)
 app.config['CACHE_TYPE'] = 'FileSystemCache'
@@ -18,16 +19,15 @@ def root_func():
     return "<p>Hello, World!</p>"
 
 
-def graph_numeric(data, name, value):
-    fig = plot_amount(data, col=name, val=value, bins=50, label_rotation=False)
-    fig.savefig(f'{name}.png')
+# def graph_numeric(data, name, value):
+#     fig = plot_amount(data, col=name, val=value, bins=50, label_rotation=False)
+#     fig.savefig(f'{name}.png')
+
 
 
 def load_process():
-    path = 'input/application_test.csv'
-
+    path = 'input/application_test_prepro.csv'
     save_dir = 'obj_save/'
-
     objects_to_save = ["data", "model", "_scaler", "_impute", "_le", "feature_le_encoded", "_ohe"]
     loaded_objects = {}
 
@@ -55,13 +55,13 @@ _le = object_loaded["_le"]
 _ohe = object_loaded["_ohe"]
 feature_le_encoded = object_loaded["feature_le_encoded"]
 
+
 #
 # # # Loading of the model
 # mlflow.set_tracking_uri("http://127.0.0.1:5000/")
 # logged_model = 'runs:/2b5cf95663c840a8b5b3b39b7cc51d9e/LGBMClassifier'
 # # Load model as a PyFuncModel.
 # model = mlflow.sklearn.load_model(logged_model)
-
 
 def process_2(x, var=None):
     """
@@ -98,11 +98,25 @@ def load_initial_data():
         'days_birth': int(row_select["DAYS_BIRTH"])
     }
 
-    graph_numeric(df, name="AMT_CREDIT", value=details.get('amt_credit'))
-    graph_numeric(df, name="AMT_INCOME_TOTAL",value=details.get('amt_income_total'))
-    graph_numeric(df, name="AMT_ANNUITY", value=details.get('amt_annuity'))
-    graph_numeric(df, name="DAYS_EMPLOYED", value=details.get('days_employed'))
-    graph_numeric(df, name="DAYS_BIRTH", value=details.get('days_birth'))
+    # graph_numeric(df, name="AMT_CREDIT", value=details.get('amt_credit'))
+    fig1 = plot_amount(df, col="AMT_CREDIT", val=details.get('amt_credit'), bins=50, label_rotation=False)
+    fig1.savefig(f'{"AMT_CREDIT"}.png')
+
+    # graph_numeric(df, name="AMT_INCOME_TOTAL", value=details.get('amt_income_total'))
+    fig2 = plot_amount(df, col="AMT_INCOME_TOTAL", val=details.get('amt_income_total'), bins=50, label_rotation=False)
+    fig2.savefig(f'{"AMT_INCOME_TOTAL"}.png')
+
+    # graph_numeric(df, name="AMT_ANNUITY", value=details.get('amt_annuity'))
+    fig3 = plot_amount(df, col="AMT_ANNUITY", val=details.get('amt_annuity'), bins=50, label_rotation=False)
+    fig3.savefig(f'{"AMT_ANNUITY"}.png')
+
+    # graph_numeric(df, name="DAYS_EMPLOYED", value=details.get('days_employed'))
+    fig4 = plot_amount(df, col="DAYS_EMPLOYED", val=details.get('days_employed'), bins=50, label_rotation=False)
+    fig4.savefig(f'{"DAYS_EMPLOYED"}.png')
+
+    # graph_numeric(df, name="DAYS_BIRTH", value=details.get('days_birth'))
+    fig5 = plot_amount(df, col="DAYS_BIRTH", val=details.get('days_birth'), bins=50, label_rotation=False)
+    fig5.savefig(f'{"DAYS_BIRTH"}.png')
 
     # Convertissez le DataFrame en un dictionnaire JSON compatible
     json_data = {'ids': df['SK_ID_CURR'].to_dict(), 'values': details}
@@ -126,17 +140,39 @@ def load_data(id):
         'days_employed': abs(int(row_select["DAYS_EMPLOYED"].values[0])),
         'days_birth': int(row_select["DAYS_BIRTH"].values[0])
     }
-    graph_numeric(df, name="AMT_CREDIT", value=details.get('amt_credit'))
-    graph_numeric(df, name="AMT_INCOME_TOTAL", value=details.get('amt_income_total'))
-    graph_numeric(df, name="AMT_ANNUITY", value=details.get('amt_annuity'))
-    graph_numeric(df, name="DAYS_EMPLOYED", value=details.get('days_employed'))
-    graph_numeric(df, name="DAYS_BIRTH", value=details.get('days_birth'))
+    # graph_numeric(df, name="AMT_CREDIT", value=details.get('amt_credit'))
+    fig1 = plot_amount(df, col="AMT_CREDIT", val=details.get('amt_credit'), bins=50, label_rotation=False)
+    fig1.savefig(f'{"AMT_CREDIT"}.png')
+
+    # graph_numeric(df, name="AMT_INCOME_TOTAL", value=details.get('amt_income_total'))
+    fig2 = plot_amount(df, col="AMT_INCOME_TOTAL", val=details.get('amt_income_total'), bins=50, label_rotation=False)
+    fig2.savefig(f'{"AMT_INCOME_TOTAL"}.png')
+
+    # graph_numeric(df, name="AMT_ANNUITY", value=details.get('amt_annuity'))
+    fig3 = plot_amount(df, col="AMT_ANNUITY", val=details.get('amt_annuity'), bins=50, label_rotation=False)
+    fig3.savefig(f'{"AMT_saveANNUITY"}.png')
+
+    # graph_numeric(df, name="DAYS_EMPLOYED", value=details.get('days_employed'))
+    fig4 = plot_amount(df, col="DAYS_EMPLOYED", val=details.get('days_employed'), bins=50, label_rotation=False)
+    fig4.savefig(f'{"DAYS_EMPLOYED"}.png')
+
+    # graph_numeric(df, name="DAYS_BIRTH", value=details.get('days_birth'))
+    fig5 = plot_amount(df, col="DAYS_BIRTH", val=details.get('days_birth'), bins=50, label_rotation=False)
+    fig5.savefig(f'{"DAYS_BIRTH"}.png')
 
     # Convertissez le DataFrame en un dictionnaire JSON compatible
     json_data = {'ids': df['SK_ID_CURR'].to_dict(), 'values': details}
 
     return jsonify(json_data)
 
+
+def get_shap(mymodel, data):
+    explainer = shap.Explainer(mymodel)
+    # Shap values of the customer
+    shap_values_loc = explainer(data.iloc[0].drop(['SK_ID_CURR'], errors='ignore').to_numpy().reshape(1, -1))
+    # Feature names
+    shap_values_loc.feature_names = data.drop(['SK_ID_CURR'], axis=1).columns.tolist()
+    plot_local_water(shap_values_loc, max_display=10)
 
 
 @app.route("/predict", methods=['GET'])
@@ -155,7 +191,7 @@ def predict():
 
     if len(data) >= 1:
         row_data = data.iloc[0]
-        row_data_x = row_data.drop(['TARGET','SK_ID_CURR'], errors='ignore')
+        row_data_x = row_data.drop(['SK_ID_CURR'], errors='ignore')
 
         # Faites la prédiction (remplacez cela par votre propre logique)
         row_data_x_reshape = row_data_x.values.reshape(1, -1)
@@ -164,6 +200,7 @@ def predict():
 
         # Convertissez le résultat de la prédiction en un dictionnaire JSON
         prediction_result = {'proba': proba_pre.tolist(), 'prediction': y_pre.tolist()}  # Assurez-vous que y_pre est sérialisable
+        get_shap(model, data)
 
         # Retournez le résultat sous forme de réponse JSON
         return jsonify(prediction_result)
@@ -173,19 +210,6 @@ if __name__ == "__main__":
     app.run(host='localhost', port=3000, debug=True)
 
 
-# http://localhost:1234/api/get_data_from_id/?id=1
+# http://localhost:3000/api/get_data_from_id/?id=1
 
-# app.run(host='localhost', port=1234)
-
-
-# 1- Brut
-# 2- Acces au model Ramifié
-# 3- Acces au Model par le serveur
-
-######################"
-# - Finaliser le Web
-# - Mettre à jour les modèles , Creant score metier
-
-# - Charge MLFLOW pour tracking
-# - Faire le Flask
-# - Faire le GIT
+# app.run(host='localhost', port=3000)

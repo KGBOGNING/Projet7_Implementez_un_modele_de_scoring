@@ -51,7 +51,7 @@ def test_encode_data_2_without_target(sample_data, encoders):
     assert result.shape[0] == df_no_target.shape[0]
     assert result.shape[1] == df_no_target.shape[1] - 1 + len(x_encoder.get_feature_names_out(['Category_Column']))
 
-
+@pytest.fixture
 def test_impute_data(sample_data):
     columns = [name for name in sample_data.columns if name not in ['SK_ID_CURR', 'TARGET']]
     # Créer une instance de SimpleImputer pour imputer les valeurs manquantes avec la médiane

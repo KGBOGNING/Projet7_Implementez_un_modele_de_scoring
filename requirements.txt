@@ -76,3 +76,4 @@ urllib3==2.2.1
 validators==0.22.0
 Werkzeug==3.0.1
 zipp==3.17.0
+shap==0.44.0

@@ -11,3 +11,7 @@ impute
 .pytest_cache
 .ipynb_checkpoints
 __pycache__
+agg_previous_application.csv
+application_train_prepro.csv
+agg_bureau.csv
+logs.log

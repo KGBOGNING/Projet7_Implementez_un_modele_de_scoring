@@ -4,13 +4,17 @@ from sklearn.preprocessing import LabelEncoder, PolynomialFeatures, MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from matplotlib.ticker import MaxNLocator, AutoMinorLocator
+# from matplotlib.ticker import MaxNLocator, AutoMinorLocator
 
 # imputer for handling missing values
 from sklearn.impute import SimpleImputer
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
+import plotly.graph_objects as go
+import plotly.io as pio
+
+plt.rcParams['figure.max_open_warning'] = 50
 
 
 # Function to calculate missing values by column# Funct
@@ -267,6 +271,54 @@ def data_description(folder):
     return comparative_table
 #################################################################################################
 
+
+def plot_local_water(shap_values_loc, max_display=10):
+    # Extraction des valeurs SHAP, des noms de fonctionnalités et des données
+    shap_values = shap_values_loc[0].values[:, 1]
+    feature_name = shap_values_loc[0].feature_names
+    data_values = shap_values_loc[0].data
+
+    # Création d'un DataFrame avec les valeurs SHAP, les noms de fonctionnalités et les données
+    df_values = pd.DataFrame({"features": feature_name,
+                              "shap_values": shap_values,
+                              "data": data_values})
+
+    # Trier les fonctionnalités par leur valeur SHAP absolue
+    df_values["abs_shap_values"] = np.abs(df_values["shap_values"])
+    df_values = df_values.sort_values("abs_shap_values", ascending=False).head(max_display)
+
+    # Ajouter une ligne pour la somme des autres valeurs SHAP
+    sum_others = df_values["shap_values"].sum()
+    df_values.loc[len(df_values)] = ["Sum of other features", sum_others, np.nan, np.nan]
+
+    # Créer un graphique waterfall
+    fig = go.Figure(go.Waterfall(
+        orientation="h",
+        measure=["relative"] * len(df_values),
+        y=df_values["features"],
+        x=df_values["shap_values"],
+        text=df_values["shap_values"].round(3),
+        base=shap_values_loc[0].base_values[1],
+        increasing={"marker": {"color": "red"}},
+        decreasing={"marker": {"color": "green"}},
+        alignmentgroup="Sum of other features",  # Identifiant pour l'alignement des barres
+        offsetgroup="Sum of other features"  # Identifiant pour l'ajustement des étiquettes y
+    ))
+
+    # Mise en forme du titre et des axes
+    fig.update_layout(
+        title="Features importance client",
+        xaxis_title="Shap value ()",
+        # yaxis_title="Features",
+        xaxis_tickangle=0,
+        width=1000,  # Largeur de la figure en pixels
+        height=600  # Hauteur de la figure en pixels
+    )
+    pio.write_image(fig, 'waterfall_plot.png')
+
+    return
+
+
 def load_data():
     path = './input/application_train.csv'
     data = pd.read_csv(path)
@@ -275,21 +327,30 @@ def load_data():
 
 
 def plot_amount(data, col, val, bins=30, label_rotation=True):
-    plt.style.use('fivethirtyeight')
-
     # Plot the distribution of the numerical feature
     fig, ax = plt.subplots()
     ax.set_title(f"Distribution of {col}")
-    ax.hist(data[col].dropna(), bins=bins, density=True, alpha=0.7, color='blue', label='Histogram') # Draw a vertical dashed line at the specified value
-    ax.axvline(x=val, color='red', linestyle='--', label=f'Value: {val}')
+    # plt.style.use('fivethirtyeight')
+
+    if col.startswith('AMT'):
+        ax.hist(data[col].dropna(), bins=bins, density=True, alpha=0.7, color='blue', label='Histogram') # Draw a vertical dashed line at the specified value
+        ax.axvline(x=abs(val), color='red', linestyle='--', label=f'Value: {val}')
+        ax.set_xscale('log')  # Set the x-axis scale to logarithmic
+    elif col.startswith('DAYS'):
+        ax.hist(abs(data[col].dropna())/365, bins=bins, density=True, alpha=0.7, color='blue',label='Histogram')  # Draw a vertical dashed line at the specified value
+        ax.axvline(x=abs(val)/365, color='red', linestyle='--', label=f'Value: {val}')
+    else:
+        ax.hist(data[col].dropna(), bins=bins, density=True, alpha=0.7, color='blue',
+                label='Histogram')  # Draw a vertical dashed line at the specified value
+        ax.axvline(x=abs(val), color='red', linestyle='--', label=f'Value: {val}')
 
     # Set labels and legend
     ax.set_xlabel(f"{col}")
     ax.set_ylabel("Density")
     ax.legend()
 
-    ax.xaxis.set_major_locator(MaxNLocator(nbins=6))
-    ax.xaxis.set_minor_locator(AutoMinorLocator())
+    # ax.xaxis.set_major_locator(MaxNLocator(nbins=6))
+    # ax.xaxis.set_minor_locator(AutoMinorLocator())
 
     # Optionally rotate x-axis labels
     if label_rotation:
@@ -297,33 +358,15 @@ def plot_amount(data, col, val, bins=30, label_rotation=True):
 
     return fig
 
-# def plot_years(data, col, val, bins=50, label_rotation=True):
-#     plt.style.use('fivethirtyeight')
-#
-#     '''use this for plotting the distribution of numerical features'''
-#     fig, ax = plt.subplots()
-#     ax.set_title(f"Distribution of {col}")
-#     sns.histplot(-(data[col].dropna()), kde=True, bins=bins, ax=ax)
-#     ax.set_xlabel(f"{col} (Years)")
-#     ax.set_ylabel("Density")
-#
-#     if label_rotation:
-#         ax.set_xticks(ax.get_xticks())
-#         ax.set_xticklabels(ax.get_xticklabels(), rotation=90, ha='right')  # Ajout de l'argument 'ha'
-#
-#     plt.axvline(x=val, color='red', linestyle='--')  # Set the y-axis limit
-#
-#     st.pyplot(fig)
-
 
 def post_treatment(df):
     # Create an anomalous flag column
     data = df.copy()
 
     data['DAYS_EMPLOYED_ANOM'] = data["DAYS_EMPLOYED"] == 365243
-
     # Replace the anomalous values with nan
     data['DAYS_EMPLOYED'].replace({365243: np.nan}, inplace=True)
+
     data['DAYS_BIRTH'] = abs(data['DAYS_BIRTH'])
 
     return pd.DataFrame(data)
@@ -495,7 +538,12 @@ def draw_gauge(value, max_value):
     ratio = value / max_value
 
     # Définit la couleur de la barre en fonction du ratio
-    color = (ratio, 1 - ratio, 0)
+    if ratio < 0.35:
+        color = "green"  # Faible risque
+    elif ratio >= 0.35 and ratio <= 0.5:
+        color = "orange"  # Risque modéré
+    else:
+        color = "red"  # Risque élevé
 
     # Trace le graphique à barres horizontales
     fig, ax = plt.subplots(figsize=(8, 1))
@@ -504,7 +552,7 @@ def draw_gauge(value, max_value):
     ax.barh([0], [ratio], color=color, height=1)
 
     # Barre au milieu (en noir)
-    ax.vlines(x=0.5, ymin=0, ymax=1, color='black', linestyle='-', linewidth=1)
+    ax.vlines(x=0.35, ymin=0, ymax=1, color='black', linestyle='-', linewidth=1)
 
     ax.set_xlim(0, 1)
     ax.set_xticks([])
@@ -513,16 +561,14 @@ def draw_gauge(value, max_value):
     # Ajoute un titre à la jauge
     ax.set_title("Niveau de risque du client")
 
-
-    # Ajoute un texte indiquant si le crédit est accordé ou non
-    credit_status = "Crédit Accordé" if ratio < 0.5 else "Crédit Refusé"
-    color_status = "green" if ratio < 0.5 else "red"
+    # Ajoute un texte indiquant le niveau de risque
+    risk_level = "Accordé" if ratio < 0.35 else ("Refusé dossier à examiner" if ratio <= 0.5 else "Refusé Risque Élevé")
+    color_status = "green" if ratio < 0.35 else ("orange" if ratio <= 0.5 else "red")
 
     # Utilise st.markdown avec du code HTML pour ajuster la couleur du texte
-    st.markdown(f'<p style="color:{color_status}">{credit_status}</p>', unsafe_allow_html=True)
+    st.markdown(f'<p style="color:{color_status}">Credit : {risk_level}</p>', unsafe_allow_html=True)
 
     st.pyplot(fig)
-
     # Exemple d'utilisation
 
 
