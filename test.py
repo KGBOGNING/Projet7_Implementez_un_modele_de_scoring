@@ -48,7 +48,6 @@ def test_encode_data_2_without_target(sample_data, encoders):
     y_encoder, x_encoder = encoders
 
     result = encode_data_2(df_no_target, y_encoder, x_encoder)
-
     # Assertions pour vérifier le résultat
     assert result.shape[0] == df_no_target.shape[0]
     assert result.shape[1] == df_no_target.shape[1] - 1 + len(x_encoder.get_feature_names_out(['Category_Column']))
