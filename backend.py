@@ -29,7 +29,6 @@ def create_app(config):
     #     fig.savefig(f'{name}.png')
 
     def load_process():
-        print('sxxsxsxsxs: ', app.config.get('PROJECT_DIR'))
         path = app.config.get('PROJECT_DIR') + app.config.get('CSV_DIR') + '/application_test_prepro.csv'
         save_dir = app.config.get('PROJECT_DIR') + app.config.get('SAVE_DIR')
         objects_to_save = ["data", "model", "_scaler", "_impute", "_le", "feature_le_encoded", "_ohe"]
