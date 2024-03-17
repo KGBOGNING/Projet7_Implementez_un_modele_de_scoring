@@ -36,8 +36,8 @@ jobs:
            echo "FLASK_ENV=$FLASK_ENV" >> $GITHUB_ENV
            echo "FLASK_DEBUG=$FLASK_DEBUG" >> $GITHUB_ENV
 
-#      - name: Test Unitaire
-#        run: python test.py
+      - name: Test Unitaire
+        run: python test.py
 #
 #      - name: Test with pytest
 #        run: |
