@@ -39,6 +39,11 @@ jobs:
       - name: Test Unitaire
         run: python test.py
 
+      - name: Test with pytest
+        run: |
+            pip install pytest pytest-cov
+            pytest test.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+
 #      - name: Print debugging information
 #        run: |
 #          echo "Python Version: $(python --version)"

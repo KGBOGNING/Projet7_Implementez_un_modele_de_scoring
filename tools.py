@@ -9,7 +9,6 @@ from sklearn.metrics import accuracy_score
 # imputer for handling missing values
 from sklearn.impute import SimpleImputer
 import matplotlib.pyplot as plt
-import seaborn as sns
 import streamlit as st
 import plotly.graph_objects as go
 import plotly.io as pio
