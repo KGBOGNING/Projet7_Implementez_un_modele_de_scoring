@@ -5,7 +5,6 @@ from config import config
 # config.update({'PROJECT_DIR': os.path.dirname(__file__) + '/'})
 config.update({'TESTING': True})
 
-
 from backend import create_app
 
 
