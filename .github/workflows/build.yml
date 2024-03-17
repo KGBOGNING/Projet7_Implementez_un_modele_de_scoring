@@ -1,0 +1,89 @@
+name: Build Flask App
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Create virtual env
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+#
+#      - name: Test
+#        run: |
+#          pip install pytest pytest-cov
+#          pytest test.py
+
+      - name: Set up SSH key and whitelist EC2 IP address
+        run: |
+          mkdir -p ~/.ssh
+          echo """-----BEGIN RSA PRIVATE KEY-----
+          MIIEogIBAAKCAQEAmDJEcDSU4O7g3XSjRWXNd1jv5MBvIRtqcdynTMNcu0Z1prkJ
+          J5+g7sE/RL0BQDqFqFmiMHpCLaIu4d6+8XYP5Y+eUfY5Vfb+b+Z5KfjiqPYEBIle
+          8wklaxpIl1H9tXaYlrG2AJMT7cxfBqLZAdmAbdczrZiwvgvSudFDPR5XJlr1+sw6
+          TjRPhpLeqOfVqMLp/+0cVW6+z6ayOsmXAHMiGWmQrXV+oA9zHVtQmwHUoeni8SpE
+          ckiF+JlOE8EHEg+ySBUapF50eugTFhzATNT4hLl4DWTQnTfi8u8Vh73Dbr1gboRg
+          Mz6dLDxLwNzoYWL2Trn3LtDLyKRUrO+yAksWHwIDAQABAoIBABP2Y+ujufNW4b+q
+          UNAFblG9JJoIc4sQIYIVwwvahAs8TqozkvPTiDRIvJezgrp98pIGT7O0FYIOx79w
+          i/L33VXq5IUzmomf//eFb1cGAhTPT++YZQ/Tn0jRBbxzUKfAinsZjBm/MNn7+GrS
+          aUxIzwOZOnoGkQgcXONqgzs9A4lQKPPyvl2MQGRFjuKjl6+gZoOe4FKXavlNvmBl
+          mdWneLb3NU0FogOS9snrghY9KoYAdvZQk+4BgrL9HZQwz7x0UGGinLVTJDzMSqfH
+          BsfKs6NGc4vgp/mlVInQ/7XUomqEBzPkA89fsD/HcuhkhWPYyvHx51hxIn/imm0u
+          g2SZs6ECgYEA2a+e3Xxe1fz3qvUINfGZhuJFjQodBG21gx8MXEZiypMKWFtodpbN
+          q/uAGrIBLJediHQMI5k5KzJlMJi2+Vkec2TZ8iPckj9rwOWsP959OuK4Z64xYSx5
+          Kq72sp1ArAaf6DuXPHheW9f9tm18CSGPeFGKOow0y3BODhMw2elFqhMCgYEAsvvZ
+          T3gOAF8jvpjCIXdO2QyUBmAsg67BqZ/Zg8XRfgyCWp8oGfz1OqhHu8E8rDwA6ySf
+          EvPR+++Lp779EjYkNNKz4Z/XfPpO810PsiQz5qwRTNFvmRDPc45CMtMCvhaPik7x
+          rNx79ojJpDiXndaxVtWclC6RMUZvdiNOnHFCpUUCgYAO6sz9KoepLFOggHgWkj7O
+          EnVnq9i/M/FrUdZcAGrGrPrZgTIQZlcjwPFPYwFXl/AwqJsoWVikkCiFAwIO5j+C
+          8tdIk5KK5xOwPUznd4ynW1/9ot85ZH3NIf4/0SzcXPvaQzMi7rCwpIV7WddVHNqj
+          CRtq1a7Mfh6rMj93v1eJxwKBgBKbResSAvqc6V1eCghqm8LKoPTMuLPzzeQxXu5o
+          +S9OY5rCIuwYtPGlHtfw7brF/h5zzymsOS8kpvMIUsy63iazpMmW0VMHvn9kNEaD
+          pvWa+61ttFlIOxi7ODyKXSWfuMpbDJq4zRZDABtXWsOo1wS87islcCicNugkIX73
+          80K1AoGAf5unZ9tr2xLpr+cjEes/PrxfnC2l9SeDMUKG8b0nEdgwtwQpouxvARgc
+          6g6dEjpPNs+/dT2UnTh8pEuXagSxYu444VKkEudUj2oaivIDRC1izaI8v37ZFEDl
+          yohuufOv7jJugw5zKCPsq5eidiaed9wncMQ4/Syqg68eKnKl0No=
+          -----END RSA PRIVATE KEY-----""" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan 16.170.237.49 >> ~/.ssh/known_hosts
+
+      - name: Copy the main script to remote server
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+        run: |
+          scp -r deploy.sh ubuntu@16.170.237.49:/home/ubuntu/
+
+      - name: Deploying in EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+          PROJECT_HOME_DIR: ${{ secrets.PROJECT_HOME_DIR }}
+          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+
+        run: |
+          ssh -o StrictHostKeyChecking=no  ubuntu@16.170.237.49 "chmod +x ./deploy.sh && ./deploy.sh"
+            
+            
+            
+
