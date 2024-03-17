@@ -41,7 +41,7 @@ def create_app(config):
         else:
             for key in objects_to_save:
                 if key != "data":
-                    with open(save_dir + '\\' + f"{key}.pkl", "rb") as file:
+                    with open(save_dir + f"{key}.pkl", "rb") as file:
                         loaded_objects[key] = pickle.load(file)
                 else:
                     print('frffrf', path)
