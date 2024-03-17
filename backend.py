@@ -1,11 +1,11 @@
-from tools import (plot_amount, post_treatment, pre_encoded_feature, impute_data, scaling_data, encode_data_2,
+from .tools import (plot_amount, post_treatment, pre_encoded_feature, impute_data, scaling_data, encode_data_2,
                    plot_local_water)
 from flask import Flask, request, jsonify
 from flask_caching import Cache
 import pickle
 import pandas as pd
 import shap
-from config import config
+from .config import config
 
 
 def create_app(config):
