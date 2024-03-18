@@ -5,8 +5,7 @@ PROJECT_DIR="Projet7_Implementez_un_modele_de_scoring"
 if [ -d "$PROJECT_DIR" ]; then
   echo "$PROJECT_DIR found.we are going to pull"
   cd $PROJECT_DIR
-  git add .
-  git pull origin develop
+  git pull --rebase
   echo "Activating venv"
   source venv/bin/activate
   echo "Updating pip"
