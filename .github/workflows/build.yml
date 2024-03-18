@@ -19,16 +19,21 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Create virtual env and Install dependencies
+
+      - name: Create virtual env
         run: |
           python -m venv venv
-          venv/bin/python -m pip install --upgrade pip
-          venv/bin/python -m pip install -r requirements.txt
+          source venv/bin/activate
 
-      - name: Test
+      - name: Install dependencies
         run: |
-          venv/bin/pip install pytest pytest-cov
-          venv/bin/pytest /home/runner/work/Projet7_Implementez_un_modele_de_scoring/Projet7_Implementez_un_modele_de_scoring/test.py
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Test with pytest
+        run: |
+            pip install pytest pytest-cov
+            pytest test.py
 
       - name: Set up SSH key and whitelist EC2 IP address
         run: |
