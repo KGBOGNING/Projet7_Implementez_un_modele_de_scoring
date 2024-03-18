@@ -19,25 +19,20 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Create virtual env
+      - name: Create virtual env and Install dependencies
         run: |
           python -m venv venv
-          source venv/bin/activate
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          venv/bin/python -m pip install --upgrade pip
+          venv/bin/python -m pip install -r requirements.txt
 
       - name: Test
         run: |
-          pip install pytest pytest-cov
-          pytest test.py
-
+          venv/bin/pip install pytest pytest-cov
+          venv/bin/pytest ./KGBOGNING/Projet7_Implementez_un_modele_de_scoring/test.py
 
       - name: Set up SSH key and whitelist EC2 IP address
         run: |
-          mkdir -p ../.ssh
+          mkdir -p ~/.ssh
           echo """-----BEGIN RSA PRIVATE KEY-----
           MIIEogIBAAKCAQEAmDJEcDSU4O7g3XSjRWXNd1jv5MBvIRtqcdynTMNcu0Z1prkJ
           J5+g7sE/RL0BQDqFqFmiMHpCLaIu4d6+8XYP5Y+eUfY5Vfb+b+Z5KfjiqPYEBIle
