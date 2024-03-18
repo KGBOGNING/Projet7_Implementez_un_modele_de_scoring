@@ -3,6 +3,7 @@
 PROJECT_DIR="Projet7_Implementez_un_modele_de_scoring"
 
 if [ -d "$PROJECT_DIR" ]; then
+  .\getIP.ps1; flask run -h $ipv4
   echo "$PROJECT_DIR found. we are going to pull"
   cd $PROJECT_DIR
   git pull --rebase
