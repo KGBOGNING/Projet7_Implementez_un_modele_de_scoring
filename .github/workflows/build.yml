@@ -28,7 +28,7 @@ jobs:
       - name: Test
         run: |
           venv/bin/pip install pytest pytest-cov
-          venv/bin/pytest ./KGBOGNING/Projet7_Implementez_un_modele_de_scoring/test.py
+          venv/bin/pytest /home/runner/work/Projet7_Implementez_un_modele_de_scoring/Projet7_Implementez_un_modele_de_scoring/test.py
 
       - name: Set up SSH key and whitelist EC2 IP address
         run: |
