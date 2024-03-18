@@ -33,12 +33,10 @@ jobs:
         run: |
           pip install pytest pytest-cov
           pytest test.py
-#          --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
-          
+
 
       - name: Set up SSH key and whitelist EC2 IP address
         run: |
-#          mkdir -p ~/.ssh
           mkdir -p ../.ssh
           echo """-----BEGIN RSA PRIVATE KEY-----
           MIIEogIBAAKCAQEAmDJEcDSU4O7g3XSjRWXNd1jv5MBvIRtqcdynTMNcu0Z1prkJ
