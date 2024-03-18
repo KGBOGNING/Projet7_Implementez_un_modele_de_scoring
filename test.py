@@ -1,11 +1,11 @@
 import pytest
 import os
-from config import config
+from ..config import config
 
 # config.update({'PROJECT_DIR': os.path.dirname(__file__) + '/'})
 config.update({'TESTING': True})
 
-from .backend import create_app
+from ..backend import create_app
 
 
 @pytest.fixture
