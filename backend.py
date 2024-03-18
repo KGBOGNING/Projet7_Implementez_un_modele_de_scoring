@@ -207,7 +207,9 @@ def create_app(config):
 app = create_app(config)
 
 if __name__ == "__main__":
-    app.run(host='localhost', port=3000, debug=True)
+    app.run(host="0.0.0.0")
+
+    # app.run(host='localhost', port=3000, debug=True)
 
 # http://localhost:3000/api/get_data_from_id/?id=1
 
