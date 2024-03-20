@@ -66,7 +66,7 @@ jobs:
           yohuufOv7jJugw5zKCPsq5eidiaed9wncMQ4/Syqg68eKnKl0No=
           -----END RSA PRIVATE KEY-----""" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 51.20.144.17 >> ~/.ssh/known_hosts
+          ssh-keyscan 16.16.213.215>> ~/.ssh/known_hosts
 
       - name: Copy the main script to remote server
         env:
@@ -83,7 +83,7 @@ jobs:
           SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
 
         run: |
-          ssh -o StrictHostKeyChecking=no  ubuntu@51.20.144.17 "chmod +x ./deploy.sh && ./deploy.sh"
+          ssh -o StrictHostKeyChecking=no  ubuntu@16.16.213.215"chmod +x ./deploy.sh && ./deploy.sh"
             
             
             
