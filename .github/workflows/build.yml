@@ -73,7 +73,7 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
         run: |
-          scp -r deploy.sh ubuntu@51.20.144.17:/home/ubuntu/
+          scp -r deploy.sh ubuntu@16.16.213.215 :/home/ubuntu/
 
       - name: Deploying in EC2
         env:
