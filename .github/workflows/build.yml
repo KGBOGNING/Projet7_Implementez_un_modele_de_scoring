@@ -65,7 +65,6 @@ jobs:
           yT9FLuiUnUvTfOYQewAi10TGqHaXJ0CNyKFpLViWUzxjcsHgm+f7aVfruZmRXaPT
           9JCNiMx8nkbsRwrCudsa6AGluusQULxlJOkSSMf5sf0Jx2KND+w4wQ==
           -----END RSA PRIVATE KEY-----""" > ~/.ssh/id_rsa
-          
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan 35.181.24.149 >> ~/.ssh/known_hosts
 
