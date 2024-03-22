@@ -39,42 +39,42 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo """-----BEGIN RSA PRIVATE KEY-----
-          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
+          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
           -----END RSA PRIVATE KEY-----""" > ~/.ssh/id_rsa
           
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 16.170.146.175 >> ~/.ssh/known_hosts
+          ssh-keyscan 13.39.82.48 >> ~/.ssh/known_hosts
 
       - name: Copy the main script to remote server
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
         run: |
-          scp -r deploy.sh ubuntu@16.170.146.175:/home/ubuntu/
+          scp -r deploy.sh ubuntu@13.39.82.48:/home/ubuntu/
 
       - name: Deploying in EC2
         env:
@@ -84,7 +84,7 @@ jobs:
           SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
 
         run: |
-          ssh -o StrictHostKeyChecking=no  ubuntu@16.170.146.175 "chmod +x ./deploy.sh && ./deploy.sh"
+          ssh -o StrictHostKeyChecking=no  ubuntu@13.39.82.48 "chmod +x ./deploy.sh && ./deploy.sh"
             
             
             
