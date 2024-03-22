@@ -73,7 +73,7 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
         run: |
-          scp -r deploy.sh ubuntu@35.181.24.149:/home/ubuntu/
+          scp -r deploy.sh ubuntu@35.181.24.149 :/home/ubuntu/
 
       - name: Deploying in EC2
         env:
@@ -83,7 +83,7 @@ jobs:
           SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
 
         run: |
-          ssh -o StrictHostKeyChecking=no  ubuntu@35.181.24.149 "chmod +x ./deploy.sh && ./deploy.sh"
+          ssh -o StrictHostKeyChecking=no  ubuntu@35.181.24.149  "chmod +x ./deploy.sh && ./deploy.sh"
             
             
             
