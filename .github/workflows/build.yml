@@ -65,16 +65,15 @@ jobs:
           yT9FLuiUnUvTfOYQewAi10TGqHaXJ0CNyKFpLViWUzxjcsHgm+f7aVfruZmRXaPT
           9JCNiMx8nkbsRwrCudsa6AGluusQULxlJOkSSMf5sf0Jx2KND+w4wQ==
           -----END RSA PRIVATE KEY-----""" > ~/.ssh/id_rsa
+
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan 35.181.24.149 >> ~/.ssh/known_hosts
-
       - name: Copy the main script to remote server
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
         run: |
-          scp -r deploy.sh ubuntu@35.181.24.149 :/home/ubuntu/
-
+          scp -r deploy.sh ubuntu@35.181.24.149:/home/ubuntu/
       - name: Deploying in EC2
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
@@ -83,7 +82,7 @@ jobs:
           SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
 
         run: |
-          ssh -o StrictHostKeyChecking=no  ubuntu@35.181.24.149  "chmod +x ./deploy.sh && ./deploy.sh"
+          ssh -o StrictHostKeyChecking=no  ubuntu@35.181.24.149 "chmod +x ./deploy.sh && ./deploy.sh"
             
             
             
